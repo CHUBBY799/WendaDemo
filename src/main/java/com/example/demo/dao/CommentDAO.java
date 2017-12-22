@@ -3,7 +3,10 @@ package com.example.demo.dao;
 import com.example.demo.model.Comment;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 @Mapper
 public interface CommentDAO {
@@ -14,4 +17,6 @@ public interface CommentDAO {
     int addComment(Comment comment);
     @Select({"select"+SELECT_FIELDS+"from"+TABLE_NAME+"where entityId=#{id}"})
     Comment selectCommentByEntityId(int id);
+    @Select({"select"+SELECT_FIELDS+"from"+TABLE_NAME+"where entityId=#{id} and entityType=#{entityType} order by id desc"})
+    List<Comment> selectLastestComment(@Param("id") int id,@Param("entityType") int entityType);
 }
