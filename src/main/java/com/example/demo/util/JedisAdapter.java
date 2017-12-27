@@ -20,7 +20,7 @@ public class JedisAdapter implements InitializingBean{
     public static void main(String[] args) {
 
         Jedis jedis=new Jedis("redis://localhost:6379/9");
-        jedis.flushDB();
+        print(1,jedis.scard("like_2_9"));
 //        jedis.set("a","123");
 //        print(1,jedis.get("a"));
 //        jedis.set("b","123");
@@ -107,12 +107,12 @@ public class JedisAdapter implements InitializingBean{
 
 
 
-        User user=new User();
-        user.setId(1);
-        jedis.set("user1", JSONObject.toJSONString(user));
-//        print(7,jedis.get("uesr1"));
-        User user2= JSON.parseObject(jedis.get("user1"),User.class);
-        print(7,user2.getId());
+//        User user=new User();
+//        user.setId(1);
+//        jedis.set("user1", JSONObject.toJSONString(user));
+////        print(7,jedis.get("uesr1"));
+//        User user2= JSON.parseObject(jedis.get("user1"),User.class);
+//        print(7,user2.getId());
     }
 
 
@@ -127,19 +127,64 @@ public class JedisAdapter implements InitializingBean{
 
     }
 
-    public int addLikebyset(String key,String value){
+    public long addLikebyset(String key,String value){
         Jedis jedis=null;
         try{
              jedis=pool.getResource();
-             jedis.sadd(key,value);
+             return jedis.sadd(key,value);
 
         }catch (Exception e){
-            logger.error("添加赞失败",e.getMessage());
+            logger.error("从set中加入失败",e.getMessage());
         }finally {
             if(jedis!=null){
                 jedis.close();
             }
         }
+            return 0;
+    }
+    public long deleteLikebyset(String key,String value){
+        Jedis jedis=null;
+        try{
+            jedis=pool.getResource();
+            return jedis.srem(key,value);
 
+        }catch (Exception e){
+            logger.error("从set中移除失败",e.getMessage());
+        }finally {
+            if(jedis!=null){
+                jedis.close();
+            }
+        }
+        return 0;
+    }
+    public long countLikebyset(String key){
+        Jedis jedis=null;
+        try{
+            jedis=pool.getResource();
+            long i=jedis.scard(key);
+            return i;
+
+        }catch (Exception e){
+            logger.error("从set中计算失败",e.getMessage());
+        }finally {
+            if(jedis!=null){
+                jedis.close();
+            }
+        }
+        return 0;
+    }
+    public boolean ismemberbyset(String key,String value){
+        Jedis jedis=null;
+        try{
+            jedis=pool.getResource();
+            return jedis.sismember(key,value);
+        }catch (Exception e ){
+            logger.error("从set中判断失败",e.getMessage());
+        }finally {
+            if(jedis!=null){
+                jedis.close();
+            }
+        }
+        return  false;
     }
 }

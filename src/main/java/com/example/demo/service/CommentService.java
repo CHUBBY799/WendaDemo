@@ -2,9 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.dao.CommentDAO;
 import com.example.demo.dao.UserDAO;
-import com.example.demo.model.Comment;
-import com.example.demo.model.User;
-import com.example.demo.model.ViewObject;
+import com.example.demo.model.*;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,6 +19,8 @@ public class CommentService {
     UserDAO userDAO;
     @Autowired
     SensitiveService sensitiveService;
+    @Autowired
+    LikeService likeService;
     public int addComment(Comment comment){
         comment.setContent(sensitiveService.filter(HtmlUtils.htmlEscape(comment.getContent())));
         return commentDAO.addComment(comment);
@@ -36,6 +36,12 @@ public class CommentService {
             ViewObject vo=new ViewObject();
             vo.set("user",user);
             vo.set("comment",comment);
+           vo.set("likecount",(likeService.countLikebyset(EntityType.COMMENT_TYPE,comment.getId())));
+           if (HostHolder.getUser()==null)
+           vo.set("islike",0);
+           else {
+               vo.set("islike",(likeService.islikememberbyset(EntityType.COMMENT_TYPE,comment.getId(),HostHolder.getUser().getId())==true?1:-1));
+           }
             list.add(vo);
 
         }

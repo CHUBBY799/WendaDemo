@@ -26,6 +26,7 @@ public class QuestionController {
     QuestionService questionService;
     @Autowired
     QuestionDAO questionDAO;
+
     @Autowired
     CommentService commentService;
     @RequestMapping(path = "/question/add",method = RequestMethod.POST)

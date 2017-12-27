@@ -3,6 +3,16 @@ package com.example.demo.model;
 import java.util.Date;
 
 public class Comment {
+    private int id;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     private int userId;
     private int entityId;
     private int entityType;
