@@ -20,6 +20,7 @@ public class UserService {
     @Autowired
     LoginTicketDAO loginTicketDAO;
     public User getUserByid(int id){return userDAO.selectById(id);}
+
     public Map<String,Object> regist(String name,String password){
         Map<String ,Object> map=new HashMap<>();
         if(StringUtils.isBlank(name)){

@@ -20,7 +20,15 @@ public class EventModel {
         return this;
     }
 
-    private Map<String,String> map=new HashMap<>();
+    public Map<String, String> getMap() {
+        return map;
+    }
+
+    public void setMap(Map<String, String> map) {
+        this.map = map;
+    }
+
+    private Map<String,String> map=new HashMap<String,String>();
 
     public EventType getEventType() {
         return eventType;

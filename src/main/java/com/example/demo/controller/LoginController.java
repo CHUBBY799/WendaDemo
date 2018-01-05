@@ -1,5 +1,8 @@
 package com.example.demo.controller;
 
+import com.example.demo.async.EventModel;
+import com.example.demo.async.EventProducer;
+import com.example.demo.async.EventType;
 import com.example.demo.model.User;
 import com.example.demo.service.UserService;
 import org.apache.commons.lang.StringUtils;
@@ -25,6 +28,8 @@ public class LoginController {
     @Autowired
     UserService userService;
 
+    @Autowired
+    EventProducer eventProducer;
     @RequestMapping(path = {"/reg/"}, method = {RequestMethod.POST})
     public String reg(@RequestParam("username") String username,
                       @RequestParam("password") String password,
@@ -77,6 +82,12 @@ public class LoginController {
 
                     return "redirect:"+next;
                 }
+                EventModel eventModel=new EventModel();
+                eventModel.setEventType(EventType.LOGIN);
+                eventModel.setMap("username",username);
+                eventModel.setMap("to","944982909@qq.com");
+
+                eventProducer.fireEvent(eventModel);
                 return "redirect:/";
             } else {
                 model.addAllAttributes(map);
