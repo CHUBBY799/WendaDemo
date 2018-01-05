@@ -2,6 +2,7 @@ package com.example.demo.util;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.example.demo.async.EventModel;
 import com.example.demo.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +12,9 @@ import redis.clients.jedis.BinaryClient;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.Tuple;
+
+import java.util.List;
+
 @Service
 public class JedisAdapter implements InitializingBean{
     public static  void print(int key,Object o){
@@ -125,6 +129,35 @@ public class JedisAdapter implements InitializingBean{
     public void afterPropertiesSet() throws Exception {
         pool=new JedisPool("redis://localhost:6379/9");
 
+    }
+    public long lpush(String key,String value){
+        Jedis jedis=null;
+        try{
+            jedis=pool.getResource();
+            return jedis.lpush(key,value);
+        }catch (Exception e ){
+            logger.error("从list中加入失败"+e.getMessage());
+
+        }finally {
+            if(jedis!=null){
+                jedis.close();
+            }
+        }
+        return 0;
+    }
+    public List<String> brpop(int timeout,String key){
+        Jedis jedis=null;
+        try{
+            jedis=pool.getResource();
+            return jedis.brpop(timeout,key);
+        }catch (Exception e ){
+            logger.error("从redis阻塞队列中获取失败");
+        }finally {
+            if(jedis!=null){
+                jedis.close();
+            }
+        }
+        return null;
     }
 
     public long addLikebyset(String key,String value){

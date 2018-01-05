@@ -15,6 +15,8 @@ public interface CommentDAO {
     String SELECT_FIELDS=" id,entityId, content, created_date, user_id, entityType,status ";
     @Insert({"insert into"+TABLE_NAME+"("+INSERT_FIELDS+")"+" values(#{entityId},#{content},#{createdDate},#{userId},#{entityType},#{status})"})
     int addComment(Comment comment);
+    @Select({"select"+SELECT_FIELDS+"from"+TABLE_NAME+"where id=#{id}"})
+    Comment selectCommentByid(int id);
     @Select({"select"+SELECT_FIELDS+"from"+TABLE_NAME+"where entityId=#{id}"})
     Comment selectCommentByEntityId(int id);
     @Select({"select"+SELECT_FIELDS+"from"+TABLE_NAME+"where entityId=#{id} and entityType=#{entityType} order by id desc"})
