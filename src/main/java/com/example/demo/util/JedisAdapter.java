@@ -8,12 +8,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Service;
-import redis.clients.jedis.BinaryClient;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.Tuple;
+import redis.clients.jedis.*;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class JedisAdapter implements InitializingBean{
@@ -130,6 +129,98 @@ public class JedisAdapter implements InitializingBean{
         pool=new JedisPool("redis://localhost:6379/9");
 
     }
+    //transaction
+    public Jedis getJedis(){
+        return pool.getResource();
+    }
+    public Transaction multi(Jedis jedis){
+        return  jedis.multi();
+    }
+    public List<Object> exec(Transaction transaction,Jedis jedis){
+        try{
+               return transaction.exec();
+        }catch (Exception e){
+            logger.error("关闭jedis事务异常"+e.getMessage());
+        }finally {
+            if(transaction!=null){
+                try{
+                    transaction.close();
+                }catch (IOException ioe){
+
+                }
+            }
+            if(jedis!=null){
+                jedis.close();
+            }
+        }
+        return null;
+    }
+    //sorted set
+    public long zadd(String key,double score,String value){
+        Jedis jedis=null;
+        try{
+            jedis=pool.getResource();
+            return jedis.zadd(key,score,value);
+
+        }catch (Exception e){
+            logger.error("从set中移除失败",e.getMessage());
+        }finally {
+            if(jedis!=null){
+                jedis.close();
+            }
+        }
+        return 0;
+    }
+    public Double zscore(String key,String member){
+        Jedis jedis=null;
+        try{
+            jedis=pool.getResource();
+            return jedis.zscore(key,member);
+
+        }catch (Exception e){
+            logger.error("从set中移除失败",e.getMessage());
+        }finally {
+            if(jedis!=null){
+                jedis.close();
+            }
+        }
+        return  null;
+    }
+    public Set<String> zrevrange(String key,long start,long end){
+
+            Jedis jedis=null;
+            try{
+                jedis=pool.getResource();
+                return jedis.zrevrange(key,start,end);
+
+            }catch (Exception e){
+                logger.error("从set中移除失败",e.getMessage());
+            }finally {
+                if(jedis!=null){
+                    jedis.close();
+                }
+            }
+            return  null;
+
+    }
+    public long  zcard(String key){
+
+        Jedis jedis=null;
+        try{
+            jedis=pool.getResource();
+            return jedis.zcard(key);
+
+        }catch (Exception e){
+            logger.error("从set中移除失败",e.getMessage());
+        }finally {
+            if(jedis!=null){
+                jedis.close();
+            }
+        }
+        return  0;
+
+    }
+    //list
     public long lpush(String key,String value){
         Jedis jedis=null;
         try{
@@ -160,6 +251,7 @@ public class JedisAdapter implements InitializingBean{
         return null;
     }
 
+    //set
     public long addLikebyset(String key,String value){
         Jedis jedis=null;
         try{

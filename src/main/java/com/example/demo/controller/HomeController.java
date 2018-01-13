@@ -1,7 +1,9 @@
 package com.example.demo.controller;
 
+import com.example.demo.model.EntityType;
 import com.example.demo.model.Question;
 import com.example.demo.model.ViewObject;
+import com.example.demo.service.FollowService;
 import com.example.demo.service.QuestionService;
 import com.example.demo.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,8 @@ public class HomeController {
     UserService userService;
     @Autowired
     QuestionService questionService;
+    @Autowired
+    FollowService followService;
 
     public List<ViewObject> getQuestions(int userId,int offset,int limit){
           List<Question> questionList=questionService.getLatestQuestions(userId,offset,limit);
@@ -28,12 +32,14 @@ public class HomeController {
               ViewObject vo=new ViewObject();
               vo.set("question",question);
               vo.set("user",userService.getUserByid(question.getUserId()));
+              vo.set("fanscount",followService.getFanscount(EntityType.QUESTION_TYPE,question.getId()));
               vos.add(vo);
           }
           return vos;
     }
     @RequestMapping(path = {"/","/index"})
     public String index(Model model){
+        followService.follow(17,EntityType.USER_TYPE,12);
         model.addAttribute("vos",getQuestions(0,0,10));
 
     return "index";
